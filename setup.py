@@ -3,10 +3,6 @@
 
 from setuptools import setup, find_packages
 
-
-with open('HISTORY.rst') as history_file:
-    history = history_file.read()
-
 requirements = [
     'protobuf',
     'six',
@@ -17,30 +13,17 @@ test_requirements = [
 ]
 
 setup(
-    name='tensorboard-pytorch',
-    version='0.6.5',
-    description='Log TensorBoard events with pytorch',
-    long_description= history,
-    author='Tzu-Wei Huang',
-    author_email='huang.dexter@gmail.com',
-    url='https://github.com/lanpa/tensorboard-pytorch',
+    name='tensorboard-chainer',
+    version='0.1',
+    description='Log TensorBoard events with chainer',
+    author='nake nat',
+    author_email='nakanat.stock@gmail.com',
+    url='https://github.com/nake-nat/tensorboard-chainer',
     packages=find_packages(exclude=['docs', 'tests']),
     include_package_data=True,
     install_requires=requirements,
     license='MIT license',
     zip_safe=False,
-    classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',        
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-    ],
     test_suite='tests',
     tests_require=test_requirements
 )
