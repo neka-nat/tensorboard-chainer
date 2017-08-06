@@ -250,14 +250,7 @@ class SummaryWriter(object):
             with open(extensionDIR + 'tensors.json', 'w') as fp:
                 json.dump(self.text_tags, fp)
     def add_graph(self, model, lastVar):
-        # prohibit second call?
-        # no, let tensorboard handles it and show its warning message.
-        import torch
-        if not hasattr(torch.autograd.Variable, 'grad_fn'):
-            print('pytorch version is too old, how about build by yourself?')
-            return
         self.file_writer.add_graph(graph(model, lastVar))
-
 
     def close(self):
         self.file_writer.flush()

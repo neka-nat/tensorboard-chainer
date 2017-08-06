@@ -16,27 +16,28 @@ def make_name(obj):
         return type(obj).__name__.replace('Backward','_')+str(id(obj))
 
 def make_list_of_nodes(fn):
-    if fn is None:
-        return 
     inputs = []
-    for next_fn, _ in fn.next_functions:
-        inputs.append(make_name(next_fn))
-        make_list_of_nodes(next_fn)
-    attrshape = []   
-    if hasattr(fn, 'variable'):#weight/bias in module
-        if fn.variable is not None:
-            attrshape = list(fn.variable.size())
-    list_of_nodes.append({'name':make_name(fn), 'op':type(fn).__name__, 'inputs':inputs, 'attr.shape':attrshape})
+    attrshape = []
+    if hasattr(fn, 'data') and fn.data is not None:  #weight/bias in module
+        attrshape = list(fn.data.shape)
+    if hasattr(fn, 'creator') and fn.creator is not None:
+        for next_fn in fn.creator.inputs:
+            inputs.append(make_name(next_fn))
+            make_list_of_nodes(next_fn)
+    list_of_nodes.append({'name': make_name(fn),
+                          'op': type(fn).__name__,
+                          'inputs': inputs,
+                          'attr.shape': attrshape})
 
 
 
 def graph(model, lastVar):
     global id2name
     global list_of_nodes
-    id2name = {id(m):n.replace('.', '/')+'(parameters)' for n, m in model.named_parameters()}
+    id2name = {id(m):n.replace('.', '/')+'(parameters)' for n, m in model.namedparams()}
     nodes = []
     list_of_nodes = []
-    make_list_of_nodes(lastVar.grad_fn)
+    make_list_of_nodes(lastVar)
     for node in list_of_nodes:
         #shape = TensorShapeProto(dim=[TensorShapeProto.Dim(size=i) for i in node['attr.shape']])  ugly...
         shape_str = str(node['attr.shape']).encode(encoding='utf_8')
