@@ -3,43 +3,36 @@ from .src.node_def_pb2 import NodeDef
 from .src.versions_pb2 import VersionDef
 from .src.attr_value_pb2 import AttrValue
 from .src.tensor_shape_pb2 import TensorShapeProto
+import chainer.computational_graph as c
 
 global id2name
-global list_of_nodes
 def make_name(obj):
-    if hasattr(obj, 'variable'):#weight/bias in module
-        if obj.variable is not None:
-            return id2name[id(obj.variable)]+'_'+str(id(obj.variable))
-        else:
-            return 'inputTensor_'+str(id(obj))
-    else:
-        return type(obj).__name__.replace('Backward','_')+str(id(obj))
+    if hasattr(obj, '_variable') and obj._variable is not None:
+        if id(obj._variable()) in id2name:
+            return id2name[id(obj._variable())]+'_'+str(id(obj._variable()))
+    return obj.label + '_' + str(id(obj))
 
 def make_list_of_nodes(fn):
-    inputs = []
-    attrshape = []
-    if hasattr(fn, 'data') and fn.data is not None:  #weight/bias in module
-        attrshape = list(fn.data.shape)
-    if hasattr(fn, 'creator') and fn.creator is not None:
-        for next_fn in fn.creator.inputs:
-            inputs.append(make_name(next_fn))
-            make_list_of_nodes(next_fn)
-    list_of_nodes.append({'name': make_name(fn),
-                          'op': type(fn).__name__,
-                          'inputs': inputs,
-                          'attr.shape': attrshape})
-
-
+    list_of_nodes = []
+    g = c.build_computational_graph([fn])
+    for n in g.nodes:
+        inputs = []
+        for e1, e2 in g.edges:
+            if e2 == n:
+                inputs.append(make_name(e1))
+        attr_shape = []
+        if hasattr(n, 'shape'):
+            attr_shape = list(n.shape)
+        list_of_nodes.append({'name':make_name(n), 'op':n.label,
+                              'inputs':inputs, 'attr.shape':attr_shape})
+    return list_of_nodes
 
 def graph(model, lastVar):
     global id2name
-    global list_of_nodes
-    id2name = {id(m):n.replace('.', '/')+'(parameters)' for n, m in model.namedparams()}
     nodes = []
-    list_of_nodes = []
-    make_list_of_nodes(lastVar)
+    id2name = {id(m):n.replace('/', '_') + '(parameters)' for n, m in model.namedparams()}
+    list_of_nodes = make_list_of_nodes(lastVar)
     for node in list_of_nodes:
-        #shape = TensorShapeProto(dim=[TensorShapeProto.Dim(size=i) for i in node['attr.shape']])  ugly...
         shape_str = str(node['attr.shape']).encode(encoding='utf_8')
-        nodes.append(NodeDef(name=node['name'], op=node['op'], input=node['inputs'], attr={'shape':AttrValue(s=shape_str)}))#, 'T':AttrValue(type="DT_FLOAT")}))
+        nodes.append(NodeDef(name=node['name'], op=node['op'], input=node['inputs'], attr={'shape':AttrValue(s=shape_str)}))
     return GraphDef(node=nodes, versions=VersionDef(producer=22))
