@@ -1,2 +1,4 @@
 proto_src/
 __pycache__
+*.pyc
+runs/
