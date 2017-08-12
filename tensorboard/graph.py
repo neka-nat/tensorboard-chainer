@@ -9,7 +9,7 @@ global id2name
 def make_name(obj):
     if hasattr(obj, '_variable') and obj._variable is not None:
         if id(obj._variable()) in id2name:
-            return id2name[id(obj._variable())]+'_'+str(id(obj._variable()))
+            return id2name[id(obj._variable())]
     return obj.label + '_' + str(id(obj))
 
 def make_list_of_nodes(fn):
@@ -30,7 +30,7 @@ def make_list_of_nodes(fn):
 def graph(model, lastVar):
     global id2name
     nodes = []
-    id2name = {id(m):n.replace('/', '_') + '(parameters)' for n, m in model.namedparams()}
+    id2name = {id(m):n[1:].replace('/', '.') for n, m in model.namedparams()}
     list_of_nodes = make_list_of_nodes(lastVar)
     for node in list_of_nodes:
         shape_str = str(node['attr.shape']).encode(encoding='utf_8')

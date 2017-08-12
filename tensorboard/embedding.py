@@ -1,5 +1,5 @@
-import cupy
 import utils
+import numpy as np
 import os
 
 def make_tsv(metadata, save_path):
@@ -13,7 +13,7 @@ def make_tsv(metadata, save_path):
 def make_sprite(label_img, save_path):
     import math
     nrow = int(math.floor(math.sqrt(label_img.shape(0))))
-    xx = utils.make_grid(cupy.zeros((1,3,32,32)), padding=0)
+    xx = utils.make_grid(np.zeros((1,3,32,32)), padding=0)
     if xx.shape(2)==33: # https://github.com/pytorch/vision/issues/206
         sprite = utils.make_grid(label_img, nrow=nrow, padding=0)
         sprite = sprite[:,1:,1:]
