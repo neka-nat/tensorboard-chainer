@@ -12,9 +12,9 @@ def make_tsv(metadata, save_path):
 # https://github.com/tensorflow/tensorboard/issues/44 image label will be squared
 def make_sprite(label_img, save_path):
     import math
-    nrow = int(math.floor(math.sqrt(label_img.shape(0))))
+    nrow = int(math.floor(math.sqrt(label_img.shape[0])))
     xx = utils.make_grid(np.zeros((1,3,32,32)), padding=0)
-    if xx.shape(2)==33: # https://github.com/pytorch/vision/issues/206
+    if xx.shape[2]==33: # https://github.com/pytorch/vision/issues/206
         sprite = utils.make_grid(label_img, nrow=nrow, padding=0)
         sprite = sprite[:,1:,1:]
         utils.save_image(sprite, os.path.join(save_path, 'sprite.png'))
@@ -30,8 +30,8 @@ def make_pbtxt(save_path, metadata, label_img):
         if label_img is not None:
             f.write('sprite {\n')
             f.write('image_path: "sprite.png"\n')
-            f.write('single_image_dim: {}\n'.format(label_img.shape(3)))
-            f.write('single_image_dim: {}\n'.format(label_img.shape(2)))
+            f.write('single_image_dim: {}\n'.format(label_img.shape[3]))
+            f.write('single_image_dim: {}\n'.format(label_img.shape[2]))
             f.write('}\n')
         f.write('}\n')
 
@@ -50,10 +50,10 @@ def add_embedding(mat, save_path, metadata=None, label_img=None):
     except OSError:
         print('warning: dir exists')
     if metadata is not None:
-        assert mat.shape(0)==len(metadata), '#labels should equal with #data points'
+        assert mat.shape[0]==len(metadata), '#labels should equal with #data points'
         make_tsv(metadata, save_path)
     if label_img is not None:
-        assert mat.shape(0)==label_img.shape(0), '#images should equal with #data points'
+        assert mat.shape[0]==label_img.shape[0], '#images should equal with #data points'
         make_sprite(label_img, save_path)
     import tensorflow as tf
     tf.reset_default_graph()

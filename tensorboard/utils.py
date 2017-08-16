@@ -1,6 +1,5 @@
 import math
 import numpy as np
-import chainer
 irange = range
 
 
@@ -86,9 +85,8 @@ def save_image(tensor, filename, nrow=8, padding=2,
         **kwargs: Other arguments are documented in ``make_grid``.
     """
     from PIL import Image
-    tensor = chainer.cuda.to_cpu(tensor.data)
     grid = make_grid(tensor, nrow=nrow, padding=padding, pad_value=pad_value,
                      normalize=normalize, range=range, scale_each=scale_each)
-    ndarr = (grid * 255).clip(0, 255).astype(np.int8).transpose((1, 2, 0))
+    ndarr = (grid * 255).clip(0, 255).astype(np.uint8).transpose((1, 2, 0))
     im = Image.fromarray(ndarr)
     im.save(filename)
