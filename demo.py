@@ -1,6 +1,5 @@
 import math
 import chainer
-import cupy
 import numpy as np
 from datetime import datetime
 from tensorboard import utils, SummaryWriter
@@ -10,7 +9,7 @@ writer = SummaryWriter('runs/'+datetime.now().strftime('%B%d  %H:%M:%S'))
 sample_rate = 44100
 freqs = [262, 294, 330, 349, 392, 440, 440, 440, 440, 440, 440]
 for n_iter in range(100):
-    M_global = cupy.random.rand(1) # value to keep
+    M_global = np.random.rand(1) # value to keep
     writer.add_scalar('M_global', M_global[0], n_iter)
     x = np.random.rand(32, 3, 64, 64) # output from network
     if n_iter%10==0:

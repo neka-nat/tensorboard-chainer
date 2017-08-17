@@ -5,6 +5,22 @@ including scalar, image, histogram, audio, text, graph and embedding.
 
 This is based on [tensorboard-pytorch](https://github.com/lanpa/tensorboard-pytorch).
 
+## Usage
+
+Install tensorflow.
+
+```
+pip install tensorflow
+```
+
+Execute demo.py and tensorboard.
+Access "localhost:6006" in your browser.
+
+```
+python demo.py
+tensorboard --logdir runs
+```
+
 ## Scalar example
 
 ![graph](screenshots/scalar.png)

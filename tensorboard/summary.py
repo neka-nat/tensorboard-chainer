@@ -41,7 +41,10 @@ from six.moves import range
 from PIL import Image
 import numpy as np
 import chainer.cuda
-import cupy
+try:
+    import cupy
+except ImportError:
+    print('Not found cupy.')
 # pylint: disable=unused-import
 from .src.summary_pb2 import Summary
 from .src.summary_pb2 import HistogramProto
