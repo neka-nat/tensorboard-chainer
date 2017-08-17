@@ -3,14 +3,24 @@ from .src.node_def_pb2 import NodeDef
 from .src.versions_pb2 import VersionDef
 from .src.attr_value_pb2 import AttrValue
 from .src.tensor_shape_pb2 import TensorShapeProto
+from collections import defaultdict
+import chainer.variable
 import chainer.computational_graph as c
+global _id2name
+global _type2ids
 
-global id2name
+def add_id(obj):
+    if not id(obj) in _type2ids[type(obj)]:
+        _type2ids[type(obj)].append(id(obj))
+
 def make_name(obj):
     if hasattr(obj, '_variable') and obj._variable is not None:
-        if id(obj._variable()) in id2name:
-            return id2name[id(obj._variable())]
-    return obj.label + '_' + str(id(obj))
+        if id(obj._variable()) in _id2name:
+            return 'Parameter_' + _id2name[id(obj._variable())]
+    add_id(obj)
+    if isinstance(obj, chainer.variable.VariableNode):
+        return 'Valiable_' + str(_type2ids[type(obj)].index(id(obj))) + ' ' + obj.label
+    return obj.label + '_' + str(_type2ids[type(obj)].index(id(obj)))
 
 def make_list_of_nodes(fn):
     list_of_nodes = []
@@ -28,9 +38,11 @@ def make_list_of_nodes(fn):
     return list_of_nodes
 
 def graph(model, lastVar):
-    global id2name
+    global _id2name
+    global _type2ids
     nodes = []
-    id2name = {id(m):n[1:].replace('/', '.') for n, m in model.namedparams()}
+    _type2ids = defaultdict(list)
+    _id2name = {id(m):n[1:].replace('/', '.') for n, m in model.namedparams()}
     list_of_nodes = make_list_of_nodes(lastVar)
     for node in list_of_nodes:
         shape_str = str(node['attr.shape']).encode(encoding='utf_8')
