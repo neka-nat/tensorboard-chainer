@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/neka-nat/tensorboard-chainer.svg?branch=master)](https://travis-ci.org/neka-nat/tensorboard-chainer)
 
+[![PyPI version](https://badge.fury.io/py/tensorboard-chainer.svg)](https://badge.fury.io/py/tensorboard-chainer)
+
 # tensorboard-chainer
 
 Write tensorboard events with simple command.
