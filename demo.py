@@ -12,16 +12,15 @@ for n_iter in range(100):
     M_global = np.random.rand(1) # value to keep
     writer.add_scalar('M_global', M_global[0], n_iter)
     x = np.random.rand(32, 3, 64, 64) # output from network
-    if n_iter%10==0:
+    if n_iter % 10 == 0:
         x = utils.make_grid(x)
         writer.add_image('Image', x, n_iter)
         x = np.zeros(sample_rate*2)
         for i in range(x.shape[0]):
-            x[i] = np.cos(freqs[n_iter//10]*np.pi*float(i)/float(sample_rate)) # sound amplitude should in [-1, 1]
+            x[i] = np.cos(freqs[n_iter//10] * np.pi * float(i) / float(sample_rate)) # sound amplitude should in [-1, 1]
         writer.add_audio('Audio', x, n_iter)
         for name, param in vgg.namedparams():
             writer.add_histogram(name, chainer.cuda.to_cpu(param.data), n_iter)
         writer.add_text('Text', 'text logged at step:'+str(n_iter), n_iter)
         writer.add_text('another Text', 'another text logged at step:'+str(n_iter), n_iter)
-
 writer.close()
