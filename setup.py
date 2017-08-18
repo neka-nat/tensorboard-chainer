@@ -14,7 +14,7 @@ test_requirements = [
 
 setup(
     name='tensorboard-chainer',
-    version='0.1',
+    version='0.1.1',
     description='Log TensorBoard events with chainer',
     author='nake nat',
     author_email='nakanat.stock@gmail.com',
