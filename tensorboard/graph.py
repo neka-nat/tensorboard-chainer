@@ -33,42 +33,30 @@ def add_id(obj):
     if not id(obj) in _type2ids[type(obj)]:
         _type2ids[type(obj)].append(id(obj))
 
-def is_intermidiate_variable(obj):
-    if isinstance(obj, chainer.variable.VariableNode) and \
-      hasattr(obj, 'creator') and obj.creator is not None:
-        return True
-    return False
-
-def make_name(obj, max_rank):
-    target = obj
-    if obj.rank < max_rank and is_intermidiate_variable(obj):
-        target = obj.creator
-    if hasattr(target, '_variable') and target._variable is not None:
-        if id(target._variable()) in _id2name:
-            return 'Parameter_' + _id2name[id(target._variable())]
-    add_id(target)
-    if isinstance(target, chainer.variable.VariableNode):
-        return 'Valiable_' + str(_type2ids[type(target)].index(id(target))) + ' ' + target.label
-    return target.label + '_' + str(_type2ids[type(target)].index(id(target)))
+def make_name(obj):
+    if hasattr(obj, '_variable') and obj._variable is not None:
+        if id(obj._variable()) in _id2name:
+            return 'Parameter_' + _id2name[id(obj._variable())]
+    add_id(obj)
+    if isinstance(obj, chainer.variable.VariableNode):
+        return 'Valiable_' + str(_type2ids[type(obj)].index(id(obj))) + ' ' + obj.label
+    return obj.label + '_' + str(_type2ids[type(obj)].index(id(obj)))
 
 def make_list_of_nodes(fn):
     list_of_nodes = []
     g = c.build_computational_graph([fn])
-    max_rank = max([n.rank for n in g.nodes])
     for n in g.nodes:
-        if n.rank < max_rank and is_intermidiate_variable(n):
-            continue
         inputs = []
         for e1, e2 in g.edges:
             if e2 == n:
-                inputs.append(make_name(e1, max_rank))
+                inputs.append(make_name(e1))
         attr_shape = []
         if hasattr(n, 'shape'):
             attr_shape = list(n.shape)
         dtype = dt.DT_INVALID
         if hasattr(n, 'dtype'):
             dtype = convert_dtype(n.dtype)
-        list_of_nodes.append({'name': make_name(n, max_rank), 'op': n.label,
+        list_of_nodes.append({'name': make_name(n), 'op': n.label,
                               'inputs': inputs,
                               'attr.shape': attr_shape,
                               'attr.dtype': dtype})
