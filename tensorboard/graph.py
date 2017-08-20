@@ -74,7 +74,7 @@ def graph(model, lastVar):
     global _type2ids
     nodes = []
     _type2ids = defaultdict(list)
-    _id2name = {id(m):n[1:].replace('/', '.') for n, m in model.namedparams()}
+    _id2name = {id(m): n[1:].replace('/', '.') for n, m in model.namedparams()}
     list_of_nodes = make_list_of_nodes(lastVar)
     for node in list_of_nodes:
         nodes.append(NodeDef(name=node['name'], op=node['op'],

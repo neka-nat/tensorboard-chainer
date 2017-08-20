@@ -34,10 +34,10 @@ def make_grid(tensor, nrow=8, padding=2,
         tensor = np.zeros((1, tensor.shape[0], tensor.shape[1]))
     if tensor.ndim == 3:  # single image
         if tensor.shape[0] == 1:  # if single-channel, convert to 3-channel
-            tensor = np.concatinate((tensor, tensor, tensor), 0)
+            tensor = np.concatenate((tensor, tensor, tensor), 0)
         return tensor
     if tensor.ndim == 4 and tensor.shape[1] == 1:  # single-channel images
-        tensor = np.concatinate((tensor, tensor, tensor), 1)
+        tensor = np.concatenate((tensor, tensor, tensor), 1)
 
     if normalize is True:
         if range is not None:
