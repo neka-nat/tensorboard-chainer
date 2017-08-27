@@ -36,11 +36,20 @@ def add_id(obj):
 def make_name(obj):
     if hasattr(obj, '_variable') and obj._variable is not None:
         if id(obj._variable()) in _id2name:
-            return 'Parameter_' + _id2name[id(obj._variable())]
+            if hasattr(obj, 'name_scope'):
+                return obj.name_scope + '/' + obj.name if obj.name is not None else 'Parameter'
+            else:
+                return 'Parameter_' + _id2name[id(obj._variable())]
     add_id(obj)
     if isinstance(obj, chainer.variable.VariableNode):
-        return 'Valiable_' + str(_type2ids[type(obj)].index(id(obj))) + ' ' + obj.label
-    return obj.label + '_' + str(_type2ids[type(obj)].index(id(obj)))
+        if hasattr(obj, 'name_scope'):
+            return obj.name_scope + '/Variable' + ' ' + obj.label
+        else:
+            return 'Variable_' + str(_type2ids[type(obj)].index(id(obj))) + ' ' + obj.label
+    if hasattr(obj, 'name_scope'):
+        return obj.name_scope + '/' + obj.label
+    else:
+        return obj.label + '_' + str(_type2ids[type(obj)].index(id(obj)))
 
 def make_list_of_nodes(fn):
     list_of_nodes = []
@@ -56,7 +65,7 @@ def make_list_of_nodes(fn):
         dtype = dt.DT_INVALID
         if hasattr(n, 'dtype'):
             dtype = convert_dtype(n.dtype)
-        list_of_nodes.append({'name': make_name(n), 'op': n.label,
+        list_of_nodes.append({'name': make_name(n), 'op': n.__class__.__name__,
                               'inputs': inputs,
                               'attr.shape': attr_shape,
                               'attr.dtype': dtype})

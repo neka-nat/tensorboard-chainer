@@ -10,7 +10,7 @@ def _init_with_name_scope(self, *args, **kargs):
     org_init(self, *args, **kargs)
 
 _org_func_init = chainer.function.Function.__init__
-_org_val_init = chainer.Variable.__init__
+_org_val_init = chainer.variable.VariableNode.__init__
 
 class name_scope(object):
     stack = []
@@ -18,7 +18,7 @@ class name_scope(object):
         self._name = name
         self.stack.append(name)
         for v in values:
-            v.name_scope = '/'.join(self.stack)
+            v.node.name_scope = '/'.join(self.stack)
 
     def __enter__(self):
         self._org_func_init = chainer.function.Function.__init__
@@ -26,14 +26,14 @@ class name_scope(object):
                                                                           name_scope='/'.join(self.stack),
                                                                           org_init=_org_func_init),
                                                         None, chainer.function.Function)
-        self._org_val_init = chainer.Variable.__init__
-        chainer.Variable.__init__ = MethodType(functools.partial(_init_with_name_scope,
-                                                                 name_scope='/'.join(self.stack),
-                                                                 org_init=_org_val_init),
-                                               None, chainer.Variable)
+        self._org_val_init = chainer.variable.VariableNode.__init__
+        chainer.variable.VariableNode.__init__ = MethodType(functools.partial(_init_with_name_scope,
+                                                                              name_scope='/'.join(self.stack),
+                                                                              org_init=_org_val_init),
+                                                            None, chainer.variable.VariableNode)
         return self
 
     def __exit__(self, exec_type, exec_value, traceback):
         chainer.function.Function.__init__ = self._org_func_init
-        chainer.Variable.__init__ = self._org_val_init
+        chainer.variable.VariableNode.__init__ = self._org_val_init
         self.stack.pop(-1)
