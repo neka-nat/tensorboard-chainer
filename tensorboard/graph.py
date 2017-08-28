@@ -27,44 +27,47 @@ def convert_dtype(dtype):
     else:
         raise ValueError('Unsupported type.')
 
-def add_id(dic, name, obj):
-    if not id(obj) in dic[name]:
-        dic[name].append(id(obj))
+class NodeName:
+    def __init__(self, nodes):
+        self.name_to_id = defaultdict(list)
+        for n in nodes:
+            name = NodeName.base_name(n)
+            if not id(n) in self.name_to_id[name]:
+                self.name_to_id[name].append(id(n))
 
-def base_name(obj):
-    name_scope = (obj.name_scope + '/') if hasattr(obj, 'name_scope') else ''
-    if hasattr(obj, '_variable') and obj._variable is not None:
-        if isinstance(obj._variable(), chainer.Parameter):
-            return name_scope + (('Parameter_' + obj.name) if obj.name is not None else 'Parameter')
-    if isinstance(obj, chainer.variable.VariableNode):
-        return name_scope + 'Variable_' + obj.label
-    return name_scope + obj.label
+    @staticmethod
+    def base_name(obj):
+        name_scope = (obj.name_scope + '/') if hasattr(obj, 'name_scope') else ''
+        if hasattr(obj, '_variable') and obj._variable is not None:
+            if isinstance(obj._variable(), chainer.Parameter):
+                return name_scope + (('Parameter_' + obj.name) if obj.name is not None else 'Parameter')
+        if isinstance(obj, chainer.variable.VariableNode):
+            return name_scope + 'Variable_' + obj.label
+        return name_scope + obj.label
 
-def make_name(obj, dic):
-    bn = base_name(obj)
-    if len(dic[bn]) == 1:
-        return bn
-    else:
-        return bn + '_' + str(dic[bn].index(id(obj)))
+    def name(self, obj):
+        bn = NodeName.base_name(obj)
+        if len(self.name_to_id[bn]) == 1:
+            return bn
+        else:
+            return bn + '_' + str(self.name_to_id[bn].index(id(obj)))
 
 def make_list_of_nodes(fn):
     list_of_nodes = []
     g = c.build_computational_graph([fn])
-    type2ids = defaultdict(list)
-    for n in g.nodes:
-        add_id(type2ids, base_name(n), n)
+    node_name = NodeName(g.nodes)
     for n in g.nodes:
         inputs = []
         for e1, e2 in g.edges:
             if e2 == n:
-                inputs.append(make_name(e1, type2ids))
+                inputs.append(node_name.name(e1))
         attr_shape = []
         if hasattr(n, 'shape'):
             attr_shape = list(n.shape)
         dtype = dt.DT_INVALID
         if hasattr(n, 'dtype'):
             dtype = convert_dtype(n.dtype)
-        list_of_nodes.append({'name': make_name(n, type2ids),
+        list_of_nodes.append({'name': node_name.name(n),
                               'op': n.__class__.__name__,
                               'inputs': inputs,
                               'attr.shape': attr_shape,
