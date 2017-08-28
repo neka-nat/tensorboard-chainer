@@ -8,7 +8,6 @@ from collections import defaultdict
 import numpy as np
 import chainer.variable
 import chainer.computational_graph as c
-global _type2ids
 
 def convert_dtype(dtype):
     if dtype == np.float32:
@@ -28,47 +27,45 @@ def convert_dtype(dtype):
     else:
         raise ValueError('Unsupported type.')
 
-def add_id(name, obj):
-    if not id(obj) in _type2ids[name]:
-        _type2ids[name].append(id(obj))
+def add_id(dic, name, obj):
+    if not id(obj) in dic[name]:
+        dic[name].append(id(obj))
 
 def base_name(obj):
+    name_scope = (obj.name_scope + '/') if hasattr(obj, 'name_scope') else ''
     if hasattr(obj, '_variable') and obj._variable is not None:
         if isinstance(obj._variable(), chainer.Parameter):
-            if hasattr(obj, 'name_scope'):
-                return obj.name_scope + '/' + obj.name if obj.name is not None else 'Parameter'
-            else:
-                return 'Parameter_' + obj.name
+            return name_scope + (('Parameter_' + obj.name) if obj.name is not None else 'Parameter')
     if isinstance(obj, chainer.variable.VariableNode):
-        if hasattr(obj, 'name_scope'):
-            return obj.name_scope + '/Variable_' + obj.label
-        else:
-            return 'Variable_' + obj.label
-    if hasattr(obj, 'name_scope'):
-        return obj.name_scope + '/' + obj.label
-    else:
-        return obj.label
+        return name_scope + 'Variable_' + obj.label
+    return name_scope + obj.label
 
-def make_name(obj):
+def make_name(obj, dic):
     bn = base_name(obj)
-    add_id(bn, obj)
-    return bn + '_' + str(_type2ids[bn].index(id(obj)))
+    if len(dic[bn]) == 1:
+        return bn
+    else:
+        return bn + '_' + str(dic[bn].index(id(obj)))
 
 def make_list_of_nodes(fn):
     list_of_nodes = []
     g = c.build_computational_graph([fn])
+    type2ids = defaultdict(list)
+    for n in g.nodes:
+        add_id(type2ids, base_name(n), n)
     for n in g.nodes:
         inputs = []
         for e1, e2 in g.edges:
             if e2 == n:
-                inputs.append(make_name(e1))
+                inputs.append(make_name(e1, type2ids))
         attr_shape = []
         if hasattr(n, 'shape'):
             attr_shape = list(n.shape)
         dtype = dt.DT_INVALID
         if hasattr(n, 'dtype'):
             dtype = convert_dtype(n.dtype)
-        list_of_nodes.append({'name': make_name(n), 'op': n.__class__.__name__,
+        list_of_nodes.append({'name': make_name(n, type2ids),
+                              'op': n.__class__.__name__,
                               'inputs': inputs,
                               'attr.shape': attr_shape,
                               'attr.dtype': dtype})
@@ -82,9 +79,7 @@ def make_attr(shape, dtype):
             'dtype': AttrValue(type=dtype)}
 
 def graph(lastVar):
-    global _type2ids
     nodes = []
-    _type2ids = defaultdict(list)
     list_of_nodes = make_list_of_nodes(lastVar)
     for node in list_of_nodes:
         nodes.append(NodeDef(name=node['name'], op=node['op'],
