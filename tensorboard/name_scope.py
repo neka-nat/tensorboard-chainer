@@ -16,7 +16,6 @@ _org_val_init = variable.VariableNode.__init__
 class name_scope(object):
     stack = []
     def __init__(self, name, values=[]):
-        self._name = name
         self.stack.append(name)
         for v in values:
             v.node.name_scope = '/'.join(self.stack)
