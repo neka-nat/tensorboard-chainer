@@ -35,7 +35,7 @@ tensorboard --logdir runs
 
 ## Graph example
 
-![graph](screenshots/graph.png)
+![graph](screenshots/graph.gif)
 
 ## Reference
 
