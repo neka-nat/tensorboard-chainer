@@ -22,10 +22,11 @@ install:
   - conda info -a
 
   # Replace dep1 dep2 ... with your dependencies
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION chainer -c soumith
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION -c soumith
   - source activate test-environment
   - which python
   - conda list
+  - pip install chainer
   - pip install pillow tensorflow
   - pip install --upgrade pytest
   - python setup.py install
