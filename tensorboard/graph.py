@@ -8,7 +8,6 @@ from collections import defaultdict
 import numpy as np
 import chainer.variable
 import chainer.computational_graph as c
-global _id2name
 global _type2ids
 
 def convert_dtype(dtype):
@@ -29,27 +28,31 @@ def convert_dtype(dtype):
     else:
         raise ValueError('Unsupported type.')
 
-def add_id(obj):
-    if not id(obj) in _type2ids[type(obj)]:
-        _type2ids[type(obj)].append(id(obj))
+def add_id(name, obj):
+    if not id(obj) in _type2ids[name]:
+        _type2ids[name].append(id(obj))
 
-def make_name(obj):
+def base_name(obj):
     if hasattr(obj, '_variable') and obj._variable is not None:
-        if id(obj._variable()) in _id2name:
+        if isinstance(obj._variable(), chainer.Parameter):
             if hasattr(obj, 'name_scope'):
                 return obj.name_scope + '/' + obj.name if obj.name is not None else 'Parameter'
             else:
-                return 'Parameter_' + _id2name[id(obj._variable())]
-    add_id(obj)
+                return 'Parameter_' + obj.name
     if isinstance(obj, chainer.variable.VariableNode):
         if hasattr(obj, 'name_scope'):
-            return obj.name_scope + '/Variable' + ' ' + obj.label
+            return obj.name_scope + '/Variable_' + obj.label
         else:
-            return 'Variable_' + str(_type2ids[type(obj)].index(id(obj))) + ' ' + obj.label
+            return 'Variable_' + obj.label
     if hasattr(obj, 'name_scope'):
         return obj.name_scope + '/' + obj.label
     else:
-        return obj.label + '_' + str(_type2ids[type(obj)].index(id(obj)))
+        return obj.label
+
+def make_name(obj):
+    bn = base_name(obj)
+    add_id(bn, obj)
+    return bn + '_' + str(_type2ids[bn].index(id(obj)))
 
 def make_list_of_nodes(fn):
     list_of_nodes = []
@@ -78,12 +81,10 @@ def make_attr(shape, dtype):
     return {'shape': AttrValue(shape=TensorShapeProto(dim=dim_list)),
             'dtype': AttrValue(type=dtype)}
 
-def graph(model, lastVar):
-    global _id2name
+def graph(lastVar):
     global _type2ids
     nodes = []
     _type2ids = defaultdict(list)
-    _id2name = {id(m): n[1:].replace('/', '.') for n, m in model.namedparams()}
     list_of_nodes = make_list_of_nodes(lastVar)
     for node in list_of_nodes:
         nodes.append(NodeDef(name=node['name'], op=node['op'],

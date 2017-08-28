@@ -249,8 +249,8 @@ class SummaryWriter(object):
                 os.makedirs(extensionDIR)
             with open(extensionDIR + 'tensors.json', 'w') as fp:
                 json.dump(self.text_tags, fp)
-    def add_graph(self, model, lastVar):
-        self.file_writer.add_graph(graph(model, lastVar))
+    def add_graph(self, lastVar):
+        self.file_writer.add_graph(graph(lastVar))
 
     def close(self):
         self.file_writer.flush()
