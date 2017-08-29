@@ -14,6 +14,19 @@ _org_func_init = function.Function.__init__
 _org_val_init = variable.VariableNode.__init__
 
 class name_scope(object):
+    """Class that creates hierarchical names for operations and variables.
+    Args:
+        name (str): Name for setting namespace.
+        values (list): Variable for setting namespace.
+    Example:
+        You can set namespace using "with" statement.
+        In the following example, no namespace is set for the variable 'X', but
+        the variable 'Y' and the relu function are set to the namespace "test".
+
+            x = chainer.Variable(...)
+            with name_scope('test'):
+               y = F.relu(x)
+     """
     stack = []
     def __init__(self, name, values=[]):
         self.stack.append(name)

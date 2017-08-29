@@ -28,6 +28,12 @@ def convert_dtype(dtype):
         raise ValueError('Unsupported type.')
 
 class NodeName:
+    """Class that creates the node's name from the list of nodes on the network.
+    Give unique names to unique nodes on the network.
+    Attributes:
+        name_to_id :A dictionary in which the key is the object name and the value
+                    is list of the object IDs.
+    """
     def __init__(self, nodes):
         self.name_to_id = defaultdict(list)
         for n in nodes:
@@ -46,6 +52,10 @@ class NodeName:
         return name_scope + obj.label
 
     def name(self, obj):
+        """Return the name of the object.
+        Args:
+            obj :A object on the network
+        """
         bn = NodeName.base_name(obj)
         if len(self.name_to_id[bn]) == 1:
             return bn
