@@ -17,7 +17,7 @@ class name_scope(object):
     """Class that creates hierarchical names for operations and variables.
     Args:
         name (str): Name for setting namespace.
-        values (list): Variable for setting namespace.
+        values (list): Variable in the namespace.
     Example:
         You can set namespace using "with" statement.
         In the following example, no namespace is set for the variable 'X', but
