@@ -50,3 +50,14 @@ class name_scope(object):
         function.Function.__init__ = self._org_func_init
         variable.VariableNode.__init__ = self._org_val_init
         self.stack.pop(-1)
+
+def within_name_scope(name):
+    def decorator(func):
+        import functools
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            with name_scope(name, self.params()):
+                res = func(self, *args, **kwargs)
+            return res
+        return wrapper
+    return decorator
