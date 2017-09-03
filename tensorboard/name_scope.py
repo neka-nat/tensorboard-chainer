@@ -26,7 +26,7 @@ class name_scope(object):
             x = chainer.Variable(...)
             with name_scope('test'):
                y = F.relu(x)
-     """
+    """
     stack = []
     def __init__(self, name, values=[]):
         self.stack.append(name)

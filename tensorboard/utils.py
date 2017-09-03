@@ -30,8 +30,10 @@ def make_grid(tensor, nrow=8, padding=2,
         for i in irange(numImages):
             tensor[i] = tensorlist[i].copy()
 
+    if tensor.ndim == 1:
+        tensor = tensor.reshape((1, tensor.shape[0]))
     if tensor.ndim == 2:  # single image H x W
-        tensor = np.zeros((1, tensor.shape[0], tensor.shape[1]))
+        tensor = tensor.reshape((1, tensor.shape[0], tensor.shape[1]))
     if tensor.ndim == 3:  # single image
         if tensor.shape[0] == 1:  # if single-channel, convert to 3-channel
             tensor = np.concatenate((tensor, tensor, tensor), 0)
