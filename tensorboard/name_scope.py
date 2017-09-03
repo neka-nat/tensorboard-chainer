@@ -52,6 +52,10 @@ class name_scope(object):
         self.stack.pop(-1)
 
 def within_name_scope(name):
+    """Decorator for link class methods.
+    Args:
+        name (str): Name for setting namespace.
+    """
     def decorator(func):
         import functools
         @functools.wraps(func)
