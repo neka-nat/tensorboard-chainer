@@ -5,10 +5,12 @@ from chainer import variable
 import functools
 from types import MethodType
 if sys.version_info >= (3, 0):
-    MethodType = lambda m, i, c: MethodType(m, i)
+    gen_method = lambda m, i, c: MethodType(m, c)
+else:
+    gen_method = lambda m, i, c: MethodType(m, i, c)
 
-def copy_method(c):
-    g = MethodType(c.__init__, None, c)
+def _copy_method(c):
+    g = gen_method(c.__init__, None, c)
     return g
 
 def _init_with_name_scope(self, *args, **kargs):
@@ -47,7 +49,7 @@ _org_classes = [function.Function,
                 chainer.functions.pooling.unpooling_2d.Unpooling2D,
                 chainer.functions.pooling.unpooling_nd.UnpoolingND,
                 variable.VariableNode]
-_copy_org_inits = [copy_method(c) for c in _org_classes]
+_copy_org_inits = [_copy_method(c) for c in _org_classes]
 
 class name_scope(object):
     """Class that creates hierarchical names for operations and variables.
@@ -73,7 +75,7 @@ class name_scope(object):
     def __enter__(self):
         for idx, c in enumerate(_org_classes):
             self._org_inits.append(c.__init__)
-            c.__init__ = MethodType(functools.partial(_init_with_name_scope,
+            c.__init__ = gen_method(functools.partial(_init_with_name_scope,
                                                       name_scope='/'.join(self.stack),
                                                       org_init=_copy_org_inits[idx]),
                                     None, c)
