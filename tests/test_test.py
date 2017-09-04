@@ -8,14 +8,17 @@ def test_demo():
     #import demo_embedding
 
 def test_name_scope():
+    import sys
     import chainer
     import numpy as np
     from tensorboard import name_scope
+    if sys.version_info >= (3, 0):
+        pass
+    else:
+        with name_scope("test"):
+            x = chainer.Variable(np.zeros((10, 10)))
+            y = chainer.functions.activation.leaky_relu.LeakyReLU()(x)
 
-    with name_scope("test"):
-        x = chainer.Variable(np.zeros((10, 10)))
-        y = chainer.functions.activation.leaky_relu.LeakyReLU()(x)
-
-    assert y.creator.name_scope == "test"
-    assert y.node.name_scope == "test"
-    assert x.node.name_scope == "test"
+        assert y.creator.name_scope == "test"
+        assert y.node.name_scope == "test"
+        assert x.node.name_scope == "test"
