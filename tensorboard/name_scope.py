@@ -1,8 +1,11 @@
+import sys
 import chainer
 from chainer import function
 from chainer import variable
 import functools
-from types import FunctionType, MethodType
+from types import MethodType
+if sys.version_info >= (3, 0):
+    MethodType = lambda m, i, c: MethodType(m, i)
 
 def copy_method(c):
     g = MethodType(c.__init__, None, c)
