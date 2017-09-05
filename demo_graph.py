@@ -3,7 +3,7 @@ import chainer.functions as F
 import chainer.links as L
 import numpy as np
 from datetime import datetime
-from tensorboard import SummaryWriter, name_scope
+from tensorboard import SummaryWriter, name_scope, within_name_scope
 
 class MLP(chainer.Chain):
     def __init__(self, n_units, n_out):
@@ -13,6 +13,7 @@ class MLP(chainer.Chain):
             self.l2 = L.Linear(None, n_units)  # n_units -> n_units
             self.l3 = L.Linear(None, n_out)  # n_units -> n_out
 
+    @within_name_scope('MLP')
     def __call__(self, x):
         with name_scope('linear1', self.l1.params()):
             h1 = F.relu(self.l1(x))
