@@ -14,11 +14,15 @@ def _copy_method(c):
     return g
 
 def _init_with_name_scope(self, *args, **kargs):
-    self.name_scope = kargs['name_scope']
-    org_init = kargs['org_init']
-    del kargs['name_scope']
-    del kargs['org_init']
+    self.name_scope = kargs['_name_scope']
+    org_init = kargs['_org_init']
+    retain_data = kargs['_retain_data']
+    del kargs['_name_scope']
+    del kargs['_org_init']
+    del kargs['_retain_data']
     org_init(self, *args, **kargs)
+    if retain_data and isinstance(self, variable.VariableNode):
+        self.retain_data()
 
 _org_classes = [function.Function,
                 chainer.functions.activation.clipped_relu.ClippedReLU,
@@ -56,6 +60,7 @@ class name_scope(object):
     Args:
         name (str): Name for setting namespace.
         values (list): Variable in the namespace.
+        retain_data (bool): Hold the data in the variable.
     Example:
         You can set namespace using "with" statement.
         In the following example, no namespace is set for the variable 'X', but
@@ -66,9 +71,10 @@ class name_scope(object):
                y = F.relu(x)
     """
     stack = []
-    def __init__(self, name, values=[]):
+    def __init__(self, name, values=[], retain_data=False):
         self.stack.append(name)
         self._org_inits = []
+        self._retain_data = retain_data
         for v in values:
             v.node.name_scope = '/'.join(self.stack)
 
@@ -76,8 +82,9 @@ class name_scope(object):
         for idx, c in enumerate(_org_classes):
             self._org_inits.append(c.__init__)
             c.__init__ = gen_method(functools.partial(_init_with_name_scope,
-                                                      name_scope='/'.join(self.stack),
-                                                      org_init=_copy_org_inits[idx]),
+                                                      _name_scope='/'.join(self.stack),
+                                                      _org_init=_copy_org_inits[idx],
+                                                      _retain_data=self._retain_data),
                                     None, c)
         return self
 
@@ -86,15 +93,16 @@ class name_scope(object):
             c.__init__ = self._org_inits[idx]
         self.stack.pop(-1)
 
-def within_name_scope(name):
+def within_name_scope(name, retain_data=False):
     """Decorator for link class methods.
     Args:
         name (str): Name for setting namespace.
+        retain_data (bool): Hold the data in the variable.
     """
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            with name_scope(name, self.params()):
+            with name_scope(name, self.params(), retain_data=retain_data):
                 res = func(self, *args, **kwargs)
             return res
         return wrapper
