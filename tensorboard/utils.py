@@ -30,6 +30,8 @@ def make_grid(tensor, nrow=8, padding=2,
         for i in irange(numImages):
             tensor[i] = tensorlist[i].copy()
 
+    assert tensor.ndim < 5, "'tensor.ndim' must be less than 5. the given 'tensor.ndim' is %d." % tensor.ndim
+
     if tensor.ndim == 1:
         tensor = tensor.reshape((1, tensor.shape[0]))
     if tensor.ndim == 2:  # single image H x W
