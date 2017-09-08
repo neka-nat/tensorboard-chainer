@@ -5,7 +5,11 @@ from chainer import variable
 import functools
 from types import MethodType
 if sys.version_info >= (3, 0):
-    gen_method = lambda m, i, c: MethodType(m, c)
+    def method_wraper(f):
+        def wrapper(*args, **kwargs):
+            return f(*args, **kwargs)
+        return functools.wraps(f)(wrapper)
+    gen_method = lambda m, i, c: method_wraper(m)
 else:
     gen_method = lambda m, i, c: MethodType(m, i, c)
 

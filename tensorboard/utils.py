@@ -76,6 +76,7 @@ def make_grid(tensor, nrow=8, padding=2,
             if k >= nmaps:
                 break
             grid[:, (y * height + 1 + padding // 2):((y + 1) * height + 1 + padding // 2 - padding), (x * width + 1 + padding // 2):((x + 1) * width + 1 + padding // 2 - padding)] = tensor[k]
+            k += 1
     return grid
 
 
