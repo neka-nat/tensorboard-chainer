@@ -1,11 +1,11 @@
 def test_demo():
-    import demo
+    from examples import demo
 
 #def test_demo_graph():
-    #import demo_graph
+    #from examples import demo_graph
 
 #def test_demo_embedding():
-    #import demo_embedding
+    #from examples import demo_embedding
 
 def test_name_scope():
     import chainer
