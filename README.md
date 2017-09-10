@@ -21,6 +21,7 @@ Execute demo.py and tensorboard.
 Access "localhost:6006" in your browser.
 
 ```
+cd examples
 python demo.py
 tensorboard --logdir runs
 ```
@@ -69,6 +70,6 @@ class MLP(chainer.Chain):
 
 ## Reference
 
-* https://github.com/lanpa/tensorboard-pytorch
-* https://github.com/TeamHG-Memex/tensorboard_logger
-* https://github.com/mitmul/tfchain
+* [tensorboard-pytorch](https://github.com/lanpa/tensorboard-pytorch)
+* [tensorboard_logger](https://github.com/TeamHG-Memex/tensorboard_logger)
+* [tfchain](https://github.com/mitmul/tfchain)
