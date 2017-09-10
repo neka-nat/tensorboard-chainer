@@ -64,7 +64,7 @@ class NodeName:
 
 def make_list_of_nodes(fn):
     list_of_nodes = []
-    g = c.build_computational_graph([fn])
+    g = c.build_computational_graph(fn)
     node_name = NodeName(g.nodes)
     for n in g.nodes:
         inputs = []

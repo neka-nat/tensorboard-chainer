@@ -21,12 +21,16 @@ from __future__ import print_function
 import time
 import json
 import os
+import numpy as np
+import chainer
+import chainer.computational_graph as c
 from .src import event_pb2
 from .src import summary_pb2
 from .src import graph_pb2
 from .event_file_writer import EventFileWriter
 from .summary import scalar, histogram, image, audio, text
-from .graph import graph
+from .graph import graph, NodeName
+from .utils import make_grid
 
 
 class SummaryToEventTransformer(object):
@@ -249,8 +253,25 @@ class SummaryWriter(object):
                 os.makedirs(extensionDIR)
             with open(extensionDIR + 'tensors.json', 'w') as fp:
                 json.dump(self.text_tags, fp)
-    def add_graph(self, lastVar):
-        self.file_writer.add_graph(graph(lastVar))
+    def add_graph(self, last_var):
+        self.file_writer.add_graph(graph(last_var))
+
+    def add_all_variable_images(self, last_var, exclude_params=True, global_step=None):
+        g = c.build_computational_graph(last_var)
+        names = NodeName(g.nodes)
+        for n in g.nodes:
+            if isinstance(n, chainer.variable.VariableNode) and \
+               (exclude_params and not isinstance(n._variable(), chainer.Parameter)) and \
+               n.data is not None:
+                data = chainer.cuda.to_cpu(n.data)
+                assert data.ndim < 5, "'variable.data' must be less than 5. the given 'variable.data.ndim' is %d." % data.ndim
+                if data.ndim == 4:
+                    for i, d in enumerate(data):
+                        img = make_grid(np.expand_dims(d, 1) if d.shape[0] != 3 else d)
+                        self.add_image(names.name(n) + '/' + str(i), img, global_step)
+                else:
+                    img = make_grid(np.expand_dims(data, 1) if data.shape[0] != 3 else data)
+                    self.add_image(names.name(n), img, global_step)
 
     def close(self):
         self.file_writer.flush()
