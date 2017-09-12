@@ -21,6 +21,7 @@ from __future__ import print_function
 import time
 import json
 import os
+import re
 import numpy as np
 import chainer
 import chainer.computational_graph as c
@@ -256,13 +257,15 @@ class SummaryWriter(object):
     def add_graph(self, last_var):
         self.file_writer.add_graph(graph(last_var))
 
-    def add_all_variable_images(self, last_var, exclude_params=True, global_step=None):
+    def add_all_variable_images(self, last_var, exclude_params=True, global_step=None, pattern='.*'):
+        cp = re.compile(pattern)
         g = c.build_computational_graph(last_var)
         names = NodeName(g.nodes)
         for n in g.nodes:
             if isinstance(n, chainer.variable.VariableNode) and \
                (exclude_params and not isinstance(n._variable(), chainer.Parameter)) and \
-               n.data is not None:
+               n.data is not None and \
+               cp.match(names.name(n)):
                 data = chainer.cuda.to_cpu(n.data)
                 assert data.ndim < 5, "'variable.data' must be less than 5. the given 'variable.data.ndim' is %d." % data.ndim
                 if data.ndim == 4:
