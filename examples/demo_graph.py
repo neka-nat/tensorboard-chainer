@@ -31,5 +31,6 @@ res = model(chainer.Variable(np.random.rand(1, 784).astype(np.float32)),
 writer = SummaryWriter('runs/'+datetime.now().strftime('%B%d  %H:%M:%S'))
 writer.add_graph([res])
 writer.add_all_variable_images([res], pattern='.*MLP.*')
+writer.add_all_parameter_histograms([res], pattern='.*MLP.*')
 
 writer.close()

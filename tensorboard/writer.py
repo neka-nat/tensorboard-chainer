@@ -257,6 +257,17 @@ class SummaryWriter(object):
     def add_graph(self, last_var):
         self.file_writer.add_graph(graph(last_var))
 
+    def add_all_parameter_histograms(self, last_var, global_step=None, pattern='.*'):
+        cp = re.compile(pattern)
+        g = c.build_computational_graph(last_var)
+        names = NodeName(g.nodes)
+        for n in g.nodes:
+            if isinstance(n, chainer.variable.VariableNode) and \
+               isinstance(n._variable(), chainer.Parameter) and \
+               cp.match(names.name(n)):
+                data = chainer.cuda.to_cpu(n.data)
+                self.add_histogram(names.name(n), data, global_step)
+
     def add_all_variable_images(self, last_var, exclude_params=True, global_step=None, pattern='.*'):
         cp = re.compile(pattern)
         g = c.build_computational_graph(last_var)
