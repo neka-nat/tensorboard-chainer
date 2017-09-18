@@ -67,6 +67,26 @@ class MLP(chainer.Chain):
         return o
 ```
 
+How to save the logs using this model is shown below.
+`add_all_variable_images` is the function that saves the Variable's data in the model that matches the pattern as an images.
+`add_all_parameter_histograms` is the function that save histograms of the Parameter's data in the model that match the pattern.
+
+```python
+from datetime import datetime
+from tensorboard import SummaryWriter
+
+model = L.Classifier(MLP(1000, 10))
+
+res = model(chainer.Variable(np.random.rand(1, 784).astype(np.float32)),
+            chainer.Variable(np.random.rand(1).astype(np.int32)))
+
+writer = SummaryWriter('runs/'+datetime.now().strftime('%B%d  %H:%M:%S'))
+writer.add_graph([res])
+writer.add_all_variable_images([res], pattern='.*MLP.*')
+writer.add_all_parameter_histograms([res], pattern='.*MLP.*')
+
+writer.close()
+```
 
 ## Reference
 

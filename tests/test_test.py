@@ -1,8 +1,8 @@
 def test_demo():
     from examples import demo
 
-#def test_demo_graph():
-    #from examples import demo_graph
+def test_demo_graph():
+    from examples import demo_graph
 
 #def test_demo_embedding():
     #from examples import demo_embedding
