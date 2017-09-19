@@ -14,11 +14,11 @@ test_requirements = [
 
 setup(
     name='tensorboard-chainer',
-    version='0.2.6',
+    version='0.2.7',
     description='Log TensorBoard events with chainer',
     author='nake nat',
     author_email='nakanat.stock@gmail.com',
-    url='https://github.com/nake-nat/tensorboard-chainer',
+    url='https://github.com/neka-nat/tensorboard-chainer',
     packages=find_packages(exclude=['docs', 'tests']),
     include_package_data=True,
     install_requires=requirements,
