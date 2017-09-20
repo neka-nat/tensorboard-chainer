@@ -99,7 +99,7 @@ class name_scope(object):
                y = F.relu(x)
     """
     stack = []
-    def __init__(self, name, values=[], retain_data=False):
+    def __init__(self, name, values=[], retain_data=True):
         self.stack.append(name)
         self._org_inits = []
         self._retain_data = retain_data
@@ -121,7 +121,7 @@ class name_scope(object):
             c.__init__ = self._org_inits[idx]
         self.stack.pop(-1)
 
-def within_name_scope(name, retain_data=False):
+def within_name_scope(name, retain_data=True):
     """Decorator for link class methods.
     Args:
         name (str): Name for setting namespace.
