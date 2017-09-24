@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/neka-nat/tensorboard-chainer.svg?branch=master)](https://travis-ci.org/neka-nat/tensorboard-chainer)
 
+[![Code Climate](https://codeclimate.com/github/neka-nat/tensorboard-chainer/badges/gpa.svg)](https://codeclimate.com/github/neka-nat/tensorboard-chainer)
+
 [![PyPI version](https://badge.fury.io/py/tensorboard-chainer.svg)](https://badge.fury.io/py/tensorboard-chainer)
 
 # tensorboard-chainer
