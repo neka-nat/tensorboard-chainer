@@ -28,8 +28,11 @@ install:
   - conda list
   - pip install chainer
   - pip install pillow tensorflow
+  - pip install codecov pytest-cov
   - pip install --upgrade pytest
   - python setup.py install
 
 script:
-  - travis_wait 30 pytest
+  - travis_wait 30 pytest --cov=./
+after_success:
+  - codecov
