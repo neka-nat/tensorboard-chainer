@@ -1,4 +1,4 @@
-from tensorboard.embedding import add_embedding
+from tb_chainer.embedding import add_embedding
 import keyword
 import numpy as np
 meta = []

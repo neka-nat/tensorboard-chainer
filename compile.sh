@@ -1,1 +1,1 @@
-protoc tensorboard/src/*.proto --python_out=.
+protoc tb_chainer/src/*.proto --python_out=.

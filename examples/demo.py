@@ -2,7 +2,7 @@ import math
 import chainer
 import numpy as np
 from datetime import datetime
-from tensorboard import utils, SummaryWriter
+from tb_chainer import utils, SummaryWriter
 
 vgg = chainer.links.VGG16Layers()
 writer = SummaryWriter('runs/'+datetime.now().strftime('%B%d  %H:%M:%S'))

@@ -2,3 +2,7 @@ proto_src/
 __pycache__
 *.pyc
 runs/
+*~
+build/*
+dist/*
+tensorboard_chainer.egg-info/*

@@ -10,7 +10,7 @@ def test_demo_graph():
 def test_name_scope():
     import chainer
     import numpy as np
-    from tensorboard import name_scope
+    from tb_chainer import name_scope
     with name_scope("test"):
         x = chainer.Variable(np.zeros((10, 10)))
         y = chainer.functions.activation.leaky_relu.LeakyReLU()(x)

@@ -49,7 +49,7 @@ Like tensorflow, nodes in the graph can be grouped together in the namespace to 
 import chainer
 import chainer.functions as F
 import chainer.links as L
-from tensorboard import name_scope, within_name_scope
+from tb_chainer import name_scope, within_name_scope
 
 class MLP(chainer.Chain):
     def __init__(self, n_units, n_out):
@@ -76,7 +76,7 @@ How to save the logs using this model is shown below.
 
 ```python
 from datetime import datetime
-from tensorboard import SummaryWriter
+from tb_chainer import SummaryWriter
 
 model = L.Classifier(MLP(1000, 10))
 

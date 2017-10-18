@@ -3,7 +3,7 @@ import chainer.functions as F
 import chainer.links as L
 import numpy as np
 from datetime import datetime
-from tensorboard import SummaryWriter, name_scope, within_name_scope
+from tb_chainer import SummaryWriter, name_scope, within_name_scope
 
 class MLP(chainer.Chain):
     def __init__(self, n_units, n_out):
