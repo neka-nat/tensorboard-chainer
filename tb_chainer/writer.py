@@ -265,7 +265,7 @@ class SummaryWriter(object):
             if isinstance(n, chainer.variable.VariableNode) and \
                isinstance(n._variable(), chainer.Parameter) and \
                cp.match(names.name(n)):
-                data = chainer.cuda.to_cpu(n.data)
+                data = chainer.cuda.to_cpu(n._variable().data)
                 self.add_histogram(names.name(n), data, global_step)
 
     def add_all_variable_images(self, last_var, exclude_params=True, global_step=None, pattern='.*'):

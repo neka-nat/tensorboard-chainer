@@ -1,7 +1,7 @@
 import sys
 import inspect
 import chainer
-from chainer import function
+from chainer import function_node
 from chainer import variable
 import functools
 from types import MethodType
@@ -40,7 +40,7 @@ def register_functions(funcs):
     _copy_org_inits = [_copy_method(c) for c in _org_classes]
 
 register_functions([m[1] for m in inspect.getmembers(chainer.functions) if inspect.isclass(m[1])] + \
-                   [function.Function, variable.VariableNode])
+                   [function_node.FunctionNode, variable.VariableNode])
 
 class name_scope(object):
     """Class that creates hierarchical names for operations and variables.

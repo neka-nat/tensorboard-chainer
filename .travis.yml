@@ -26,7 +26,7 @@ install:
   - source activate test-environment
   - which python
   - conda list
-  - pip install 'chainer==2.1.0'
+  - pip install chainer
   - pip install pillow tensorflow
   - pip install codecov pytest-cov
   - pip install --upgrade pytest
