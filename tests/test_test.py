@@ -13,7 +13,7 @@ def test_name_scope():
     from tb_chainer import name_scope
     with name_scope("test"):
         x = chainer.Variable(np.zeros((10, 10)))
-        y = chainer.functions.activation.leaky_relu.LeakyReLU()(x)
+        y = chainer.functions.activation.leaky_relu.leaky_relu(x)
 
     assert y.creator.name_scope == "test"
     assert y.node.name_scope == "test"

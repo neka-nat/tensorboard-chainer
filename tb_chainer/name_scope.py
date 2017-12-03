@@ -33,7 +33,9 @@ _org_classes = []
 _copy_org_inits = []
 
 def register_functions(funcs):
-    """Register functions to use name_scope.
+    """Register function nodes to use name_scope.
+    Args:
+        funcs (list): List of function nodes
     """
     global _org_classes, _copy_org_inits
     _org_classes.extend(funcs)
