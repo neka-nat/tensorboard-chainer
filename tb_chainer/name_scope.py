@@ -1,4 +1,5 @@
 import sys
+import inspect
 import chainer
 from chainer import function
 from chainer import variable
@@ -28,60 +29,18 @@ def _init_with_name_scope(self, *args, **kargs):
     if retain_data and isinstance(self, variable.VariableNode):
         self.retain_data()
 
-_org_classes = [function.Function,
-                chainer.functions.activation.clipped_relu.ClippedReLU,
-                chainer.functions.activation.crelu.CReLU,
-                chainer.functions.activation.elu.ELU,
-                chainer.functions.activation.leaky_relu.LeakyReLU,
-                chainer.functions.array.concat.Concat,
-                chainer.functions.array.copy.Copy,
-                chainer.functions.array.expand_dims.ExpandDims,
-                chainer.functions.array.pad.Pad,
-                chainer.functions.array.permutate.Permutate,
-                chainer.functions.array.reshape.Reshape,
-                chainer.functions.array.squeeze.Squeeze,
-                chainer.functions.array.swapaxes.Swapaxes,
-                chainer.functions.array.tile.Tile,
-                chainer.functions.array.transpose.Transpose,
-                chainer.functions.evaluation.accuracy.Accuracy,
-                chainer.functions.evaluation.classification_summary.ClassificationSummary,
-                chainer.functions.evaluation.r2_score.R2_score,
-                chainer.functions.loss.contrastive.Contrastive,
-                chainer.functions.loss.cross_covariance.CrossCovariance,
-                chainer.functions.loss.ctc.ConnectionistTemporalClassification,
-                chainer.functions.loss.decov.DeCov,
-                chainer.functions.loss.hinge.Hinge,
-                chainer.functions.loss.huber_loss.HuberLoss,
-                chainer.functions.loss.negative_sampling.NegativeSamplingFunction,
-                chainer.functions.loss.sigmoid_cross_entropy.SigmoidCrossEntropy,
-                chainer.functions.loss.softmax_cross_entropy.SoftmaxCrossEntropy,
-                chainer.functions.loss.triplet.Triplet,
-                chainer.functions.math.basic_math.AddConstant,
-                chainer.functions.math.basic_math.SubFromConstant,
-                chainer.functions.math.basic_math.MulConstant,
-                chainer.functions.math.basic_math.DivFromConstant,
-                chainer.functions.math.basic_math.PowVarConst,
-                chainer.functions.math.basic_math.PowConstVar,
-                chainer.functions.math.basic_math.MatMulVarConst,
-                chainer.functions.math.basic_math.MatMulConstVar,
-                chainer.functions.math.sum.Sum,
-                chainer.functions.connection.convolution_2d.Convolution2DFunction,
-                chainer.functions.connection.convolution_nd.ConvolutionND,
-                chainer.functions.connection.deconvolution_2d.Deconvolution2DFunction,
-                chainer.functions.connection.deconvolution_nd.DeconvolutionND,
-                chainer.functions.normalization.batch_normalization.BatchNormalizationFunction,
-                chainer.functions.normalization.l2_normalization.NormalizeL2,
-                chainer.functions.normalization.local_response_normalization.LocalResponseNormalization,
-                chainer.functions.pooling.average_pooling_2d.AveragePooling2D,
-                chainer.functions.pooling.average_pooling_nd.AveragePoolingND,
-                chainer.functions.pooling.max_pooling_2d.MaxPooling2D,
-                chainer.functions.pooling.max_pooling_nd.MaxPoolingND,
-                chainer.functions.pooling.pooling_2d.Pooling2D,
-                chainer.functions.pooling.pooling_nd._PoolingND,
-                chainer.functions.pooling.unpooling_2d.Unpooling2D,
-                chainer.functions.pooling.unpooling_nd.UnpoolingND,
-                variable.VariableNode]
-_copy_org_inits = [_copy_method(c) for c in _org_classes]
+_org_classes = []
+_copy_org_inits = []
+
+def register_functions(funcs):
+    """Register functions to use name_scope.
+    """
+    global _org_classes, _copy_org_inits
+    _org_classes.extend(funcs)
+    _copy_org_inits = [_copy_method(c) for c in _org_classes]
+
+register_functions([m[1] for m in inspect.getmembers(chainer.functions) if inspect.isclass(m[1])] + \
+                   [function.Function, variable.VariableNode])
 
 class name_scope(object):
     """Class that creates hierarchical names for operations and variables.
