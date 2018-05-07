@@ -6,6 +6,7 @@ from setuptools import setup, find_packages
 requirements = [
     'protobuf',
     'six',
+    'moviepy'
 ]
 
 test_requirements = [

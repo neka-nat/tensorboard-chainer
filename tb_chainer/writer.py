@@ -29,7 +29,7 @@ from .src import event_pb2
 from .src import summary_pb2
 from .src import graph_pb2
 from .event_file_writer import EventFileWriter
-from .summary import scalar, histogram, image, audio, text
+from .summary import scalar, histogram, image, audio, text, video
 from .graph import graph, NodeName
 from .utils import make_grid
 
@@ -245,6 +245,8 @@ class SummaryWriter(object):
         self.file_writer.add_summary(image(tag, img_tensor), global_step)
     def add_audio(self, tag, snd_tensor, global_step=None):
         self.file_writer.add_summary(audio(tag, snd_tensor), global_step)
+    def add_video(self, tag, vid_tensor, global_step=None, fps=4):
+        self.file_writer.add_summary(video(tag, vid_tensor, fps), global_step)
     def add_text(self, tag, text_string, global_step=None):
         self.file_writer.add_summary(text(tag, text_string), global_step)
         if tag not in self.text_tags:

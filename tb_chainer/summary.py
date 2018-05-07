@@ -188,6 +188,63 @@ def make_image(tensor):
                          colorspace=channel,
                          encoded_image_string=image_string)
 
+def video(tag, tensor, fps):
+    tag = _clean_tag(tag)
+    assert isinstance(tensor, np.ndarray) or isinstance(tensor, cupy.ndarray), 'input tensor should be one of numpy.ndarray, cupy.ndarray'
+    if isinstance(tensor, np.ndarray):
+        xp = np
+    else:
+        xp = cupy
+
+    assert tensor.ndim==5, 'input tensor should be 5 dimensional. (batch, channels, time, height, width)'
+        
+    b, c, t, h, w = tensor.shape
+
+    if tensor.dtype == xp.uint8:
+        tensor = xp.float32(tensor) / 255.
+
+    def is_power2(num):
+        return num != 0 and ((num & (num - 1)) == 0)
+
+    # pad to power of 2
+    while not is_power2(tensor.shape[0]):
+        tensor = xp.concatenate((tensor, xp.zeros(shape=(1, c, t, h, w))), axis=0)
+
+    b = tensor.shape[0]
+    n_rows = 2**(int(xp.log(b) / xp.log(2)) // 2)
+    n_cols = b // n_rows
+
+    tensor = np.reshape(tensor, newshape=(n_rows, n_cols, c, t, h, w))
+    tensor = np.transpose(tensor, axes=(3, 0, 4, 1, 5, 2))
+    tensor = np.reshape(tensor, newshape=(t, n_rows * h, n_cols * w, c))
+    tensor = tensor.astype(xp.float32)
+    tensor = (tensor * 255).astype(xp.uint8)
+
+    tensor = chainer.cuda.to_cpu(tensor)
+    video = make_video(tensor, fps)
+
+    return Summary(value=[Summary.Value(tag=tag, image=video)])
+
+def make_video(tensor, fps): 
+    try:
+        import moviepy.editor as mpy
+    except ImportError:
+        print('add_video needs package moviepy')
+        return
+    import tempfile
+
+    t, h, w, c = tensor.shape
+
+    # encode sequence of images into gif string
+    clip = mpy.ImageSequenceClip(list(tensor), fps=fps)
+    with tempfile.NamedTemporaryFile() as f:
+        filename = f.name + '.gif'
+
+    clip.write_gif(filename, verbose=True)
+    with open(filename, 'rb') as f:
+        tensor_string = f.read()
+        return Summary.Image(height=h, width=w, colorspace=c, encoded_image_string=tensor_string)
+
 def audio(tag, tensor, sample_rate=44100):
   tensor = tensor.squeeze()
   assert tensor.ndim==1, 'input tensor should be 1 dimensional.'
