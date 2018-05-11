@@ -23,4 +23,8 @@ for n_iter in range(100):
             writer.add_histogram(name, chainer.cuda.to_cpu(param.data), n_iter)
         writer.add_text('Text', 'text logged at step:'+str(n_iter), n_iter)
         writer.add_text('another Text', 'another text logged at step:'+str(n_iter), n_iter)
+
+video = np.random.rand(16, 3, 16, 64, 64) # (batchsize, channel, time, height, width)
+writer.add_video('Video', vid_tensor=video)
+
 writer.close()
