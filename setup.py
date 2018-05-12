@@ -11,6 +11,7 @@ requirements = [
 
 test_requirements = [
     'pytest',
+    'moviepy'
 ]
 
 setup(
