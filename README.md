@@ -31,15 +31,15 @@ tensorboard --logdir runs
 
 ## Scalar example
 
-![graph](screenshots/scalar.png)
+![graph](https://raw.githubusercontent.com/neka-nat/tensorboard-chainer/master/screenshots/scalar.png)
 
 ## Histogram example
 
-![graph](screenshots/histogram.png)
+![graph](https://raw.githubusercontent.com/neka-nat/tensorboard-chainer/master/screenshots/histogram.png)
 
 ## Graph example
 
-![graph](screenshots/graph.gif)
+![graph](https://raw.githubusercontent.com/neka-nat/tensorboard-chainer/master/screenshots/graph.gif)
 
 ## Name scope
 

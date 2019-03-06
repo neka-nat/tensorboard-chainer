@@ -16,8 +16,10 @@ test_requirements = [
 
 setup(
     name='tensorboard-chainer',
-    version='0.2.8.1',
+    version='0.2.8.2',
     description='Log TensorBoard events with chainer',
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     author='nake nat',
     author_email='nakanat.stock@gmail.com',
     url='https://github.com/neka-nat/tensorboard-chainer',
