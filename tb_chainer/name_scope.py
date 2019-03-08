@@ -98,8 +98,6 @@ class name_scope(object):
         for idx, c in enumerate(_org_classes):
             if c == variable.VariableNode:
                 c.__init__ = self._org_inits[idx]
-            else:
-                c.__new__ = self._org_inits[idx]
         self.stack.pop(-1)
 
 def within_name_scope(name, retain_data=True):
