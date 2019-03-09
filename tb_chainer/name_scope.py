@@ -89,8 +89,8 @@ class name_scope(object):
             else:
                 self._org_inits.append(c.__new__)
                 c.__new__ = classmethod(functools.partial(_new_with_name_scope,
-                                                         _name_scope='/'.join(self.stack),
-                                                         _org_new=_copy_org_inits[idx]))
+                                                          _name_scope='/'.join(self.stack),
+                                                          _org_new=_copy_org_inits[idx]))
         return self
 
     def __exit__(self, exec_type, exec_value, traceback):
@@ -98,7 +98,9 @@ class name_scope(object):
             if c == variable.VariableNode:
                 c.__init__ = self._org_inits[idx]
             else:
-                c.__new__ = self._org_inits[idx]
+                c.__new__ = classmethod(functools.partial(_new_with_name_scope,
+                                                          _name_scope='/'.join(self.stack[:-1]),
+                                                          _org_new=_copy_org_inits[idx]))
         self.stack.pop(-1)
 
 def within_name_scope(name, retain_data=True):
