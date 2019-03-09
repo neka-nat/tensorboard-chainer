@@ -50,7 +50,7 @@ def register_functions(funcs):
         if c == variable.VariableNode:
             _copy_org_inits.append(_copy_method(c.__init__, c))
         else:
-            _copy_org_inits.append(_copy_method(c.__new__, c))
+            _copy_org_inits.append(c.__new__)
 
 register_functions([function_node.FunctionNode, variable.VariableNode])
 
@@ -88,16 +88,17 @@ class name_scope(object):
                                         None, c)
             else:
                 self._org_inits.append(c.__new__)
-                c.__new__ = gen_method(functools.partial(_new_with_name_scope,
+                c.__new__ = classmethod(functools.partial(_new_with_name_scope,
                                                          _name_scope='/'.join(self.stack),
-                                                         _org_new=_copy_org_inits[idx]),
-                                        None, c)
+                                                         _org_new=_copy_org_inits[idx]))
         return self
 
     def __exit__(self, exec_type, exec_value, traceback):
         for idx, c in enumerate(_org_classes):
             if c == variable.VariableNode:
                 c.__init__ = self._org_inits[idx]
+            else:
+                c.__new__ = self._org_inits[idx]
         self.stack.pop(-1)
 
 def within_name_scope(name, retain_data=True):
