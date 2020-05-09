@@ -5,6 +5,8 @@ import numpy as np
 from datetime import datetime
 from tb_chainer import SummaryWriter, name_scope, within_name_scope
 
+np.random.seed(123)
+
 class MLP(chainer.Chain):
     def __init__(self, n_units, n_out):
         super(MLP, self).__init__()
