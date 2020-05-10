@@ -3,7 +3,7 @@ name = "tensorboard-chainer"
 packages = [
     {include = "tb_chainer"}
 ]
-version = "0.5.2"
+version = "0.5.3"
 description = ""
 authors = ["nekanat <nekanat.stock@gmail.com>"]
 license = "MIT"

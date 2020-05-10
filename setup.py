@@ -16,7 +16,7 @@ test_requirements = [
 
 setup(
     name='tensorboard-chainer',
-    version='0.5.2',
+    version='0.5.3',
     description='Log TensorBoard events with chainer',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',

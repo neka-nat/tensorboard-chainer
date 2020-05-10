@@ -30,7 +30,7 @@ from .src import summary_pb2
 from .src import graph_pb2
 from .event_file_writer import EventFileWriter
 from .summary import scalar, histogram, image, audio, text, video
-from .graph import graph, NodeName
+from .graph import graph, NodeName, build_computational_graph
 from .utils import make_grid
 
 
@@ -261,7 +261,7 @@ class SummaryWriter(object):
 
     def add_all_parameter_histograms(self, last_var, global_step=None, pattern='.*'):
         cp = re.compile(pattern)
-        g = c.build_computational_graph(last_var)
+        g = build_computational_graph(last_var)
         names = NodeName(g.nodes)
         for n in g.nodes:
             if isinstance(n, chainer.variable.VariableNode) and \
@@ -272,7 +272,7 @@ class SummaryWriter(object):
 
     def add_all_variable_images(self, last_var, exclude_params=True, global_step=None, pattern='.*'):
         cp = re.compile(pattern)
-        g = c.build_computational_graph(last_var)
+        g = build_computational_graph(last_var)
         names = NodeName(g.nodes)
         for n in g.nodes:
             if isinstance(n, chainer.variable.VariableNode) and \
