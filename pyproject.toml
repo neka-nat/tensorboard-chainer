@@ -1,15 +1,19 @@
 [tool.poetry]
 name = "tensorboard-chainer"
-version = "0.4.0"
+packages = [
+    {include = "tb_chainer"}
+]
+version = "0.5.2"
 description = ""
 authors = ["nekanat <nekanat.stock@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.6"
-chainer = "^7.4.0"
-tensorboard = "^2.2.1"
-setuptools = ">=41.0.0"
+python = "^2.7 || ^3.6 || ^3.7"
+chainer = "*"
+tensorboard = "*"
+setuptools = "*"
+twine = "*"
 
 [tool.poetry.dev-dependencies]
 
